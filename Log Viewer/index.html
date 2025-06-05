@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Log Viewer</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Light Mode Colors */
+        --primary-color: #007bff;
+        --primary-dark: #0056b3;
+        --success-bg: #d4edda;
+        --success-text: #155724;
+        --warning-bg: #fff3cd;
+        --warning-text: #856404;
+        --info-bg: #cce5ff;
+        --info-text: #004085;
+        --danger-bg: #f8d7da;
+        --danger-text: #721c24;
+        --neutral-bg: #e2e3e5;
+        --neutral-text: #383d41;
+        --background-gradient-start: #010724;
+        --background-gradient-end: #1a0133;
+        --header-gradient-start: #2c3e50;
+        --header-gradient-end: #3498db;
+        --text-primary: #495057;
+        --text-secondary: #6c757d;
+        --text-white: #ffffff;
+        --bg-white: #ffffff;
+        --bg-light: #f8f9fa;
+        --bg-stats: #e3f2fd;
+        --border-color: #e9ecef;
+
+        /* Dark Mode Colors */
+        --dark-primary-color: #66b0ff;
+        --dark-primary-dark: #3388ff;
+        --dark-success-bg: #2f4f2f;
+        --dark-success-text: #a3d7a3;
+        --dark-warning-bg: #66512c;
+        --dark-warning-text: #ffeb99;
+        --dark-info-bg: #2c4978;
+        --dark-info-text: #99c5ff;
+        --dark-danger-bg: #5c2526;
+        --dark-danger-text: #ff9999;
+        --dark-neutral-bg: #44484d;
+        --dark-neutral-text: #b0b3b8;
+        --dark-background-gradient-start: #0d0d2b;
+        --dark-background-gradient-end: #2b0d5e;
+        --dark-header-gradient-start: #1a252f;
+        --dark-header-gradient-end: #1e5aa8;
+        --dark-text-primary: #d1d4d9;
+        --dark-text-secondary: #a1a5aa;
+        --dark-text-white: #e6e6e6;
+        --dark-bg-white: #1e252f;
+        --dark-bg-light: #2c333d;
+        --dark-bg-stats: #252f3f;
+        --dark-border-color: #3a414c;
+
+        /* Spacing */
+        --spacing-xs: 5px;
+        --spacing-sm: 10px;
+        --spacing-md: 15px;
+        --spacing-lg: 20px;
+        --spacing-xl: 30px;
+        --spacing-2xl: 40px;
+
+        /* Typography */
+        --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          Roboto, sans-serif;
+        --font-size-base: 1rem;
+        --font-size-sm: 0.9rem;
+        --font-size-xs: 0.8rem;
+        --font-size-lg: 1.1rem;
+        --font-size-xl: 1.2rem;
+        --font-size-2xl: 2rem;
+        --font-weight-bold: 600;
+        --font-weight-bolder: 700;
+
+        /* Border Radius */
+        --border-radius-sm: 8px;
+        --border-radius-md: 10px;
+        --border-radius-lg: 15px;
+        --border-radius-xl: 20px;
+
+        /* Shadows */
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Dark Mode Styles */
+      .dark-mode {
+        --primary-color: var(--dark-primary-color);
+        --primary-dark: var(--dark-primary-dark);
+        --success-bg: var(--dark-success-bg);
+        --success-text: var(--dark-success-text);
+        --warning-bg: var(--dark-warning-bg);
+        --warning-text: var(--dark-warning-text);
+        --info-bg: var(--dark-info-bg);
+        --info-text: var(--dark-info-text);
+        --danger-bg: var(--dark-danger-bg);
+        --danger-text: var(--dark-danger-text);
+        --neutral-bg: var(--dark-neutral-bg);
+        --neutral-text: var(--dark-neutral-text);
+        --background-gradient-start: var(--dark-background-gradient-start);
+        --background-gradient-end: var(--dark-background-gradient-end);
+        --header-gradient-start: var(--dark-header-gradient-start);
+        --header-gradient-end: var(--dark-header-gradient-end);
+        --text-primary: var(--dark-text-primary);
+        --text-secondary: var(--dark-text-secondary);
+        --text-white: var(--dark-text-white);
+        --bg-white: var(--dark-bg-white);
+        --bg-light: var(--dark-bg-light);
+        --bg-stats: var(--dark-bg-stats);
+        --border-color: var(--dark-border-color);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-family);
+        min-height: 100vh;
+        padding: var(--spacing-lg);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--bg-white);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--header-gradient-start) 0%,
+          var(--header-gradient-end) 100%
+        );
+        color: var(--text-white);
+        padding: var(--spacing-xl) var(--spacing-2xl);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+
+      .header h1 {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bolder);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+      }
+
+      .header p {
+        font-size: var(--font-size-lg);
+        opacity: 0.9;
+      }
+
+      .theme-toggle {
+        background: none;
+        border: none;
+        color: var(--text-white);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .theme-toggle:hover {
+        transform: scale(1.1);
+      }
+
+      .controls {
+        padding: var(--spacing-lg) var(--spacing-xl);
+        background: var(--bg-light);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        gap: var(--spacing-lg);
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .upload-button {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        background: var(--primary-color);
+        color: var(--text-white);
+        border-radius: var(--border-radius-sm);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        transition: background 0.3s ease;
+      }
+
+      .upload-button:hover {
+        background: var(--primary-dark);
+      }
+
+      .upload-icon {
+        font-size: var(--font-size-base);
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-2xl) var(--spacing-sm) var(--spacing-md);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-base);
+        transition: border-color 0.3s ease;
+        background: var(--bg-white);
+        color: var(--text-primary);
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      .search-box input::placeholder {
+        color: var(--text-secondary);
+      }
+
+      .search-icon {
+        position: absolute;
+        right: var(--spacing-md);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+      }
+
+      .filter-group {
+        display: flex;
+        gap: var(--spacing-lg);
+        align-items: center;
+      }
+
+      .filter-group select {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius-sm);
+        font-size: var(--font-size-sm);
+        background: var(--bg-white);
+        cursor: pointer;
+        color: var(--text-primary);
+        transition: border-color 0.3s ease;
+      }
+
+      .filter-group select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      .toggle-switch {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        cursor: pointer;
+      }
+
+      .toggle-switch span {
+        color: var(--text-primary);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+      }
+
+      .switch {
+        position: relative;
+        width: 40px;
+        height: 20px;
+        background: #ccc;
+        border-radius: 20px;
+        transition: background 0.3s ease;
+      }
+
+      .switch.active {
+        background: var(--primary-color);
+      }
+
+      .switch-handle {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background: var(--bg-white);
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+      }
+
+      .switch.active .switch-handle {
+        transform: translateX(20px);
+      }
+
+      .stats {
+        padding: var(--spacing-lg) var(--spacing-xl);
+        background: var(--bg-stats);
+        display: flex;
+        gap: var(--spacing-lg);
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm) var(--spacing-lg);
+        background: var(--bg-white);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+      }
+
+      .stat-icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+      }
+
+      .stat-text {
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        font-size: var(--font-size-sm);
+      }
+
+      .logs-container {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .log-entry {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+      }
+
+      .log-entry:hover {
+        background: var(--bg-light);
+      }
+
+      .log-header {
+        padding: var(--spacing-md) var(--spacing-xl);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+      }
+
+      .method-badge {
+        padding: 5px 12px;
+        border-radius: var(--border-radius-xl);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        min-width: 70px;
+        text-align: center;
+      }
+
+      .method-GET {
+        background: var(--success-bg);
+        color: var(--success-text);
+      }
+      .method-POST {
+        background: var(--warning-bg);
+        color: var(--warning-text);
+      }
+      .method-PUT {
+        background: var(--info-bg);
+        color: var(--info-text);
+      }
+      .method-DELETE {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+      }
+      .method-OPTIONS {
+        background: var(--neutral-bg);
+        color: var(--neutral-text);
+      }
+
+      .status-badge {
+        padding: 5px 10px;
+        border-radius: var(--border-radius-lg);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        min-width: 50px;
+        text-align: center;
+      }
+
+      .status-200 {
+        background: var(--success-bg);
+        color: var(--success-text);
+      }
+      .status-400 {
+        background: var(--warning-bg);
+        color: var(--warning-text);
+      }
+      .status-500 {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+      }
+
+      .log-path {
+        flex: 1;
+        font-family: 'Courier New', monospace;
+        font-size: var(--font-size-sm);
+        color: var(--text-primary);
+      }
+
+      .log-time {
+        color: var(--text-secondary);
+        font-size: var(--font-size-sm);
+      }
+
+      .processing-time {
+        color: var(--primary-color);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+      }
+
+      .expand-icon {
+        transition: transform 0.3s ease;
+      }
+
+      .expand-icon.rotated {
+        transform: rotate(90deg);
+      }
+
+      .log-details {
+        padding: var(--spacing-lg) var(--spacing-xl);
+        background: var(--bg-light);
+        border-top: 1px solid var(--border-color);
+      }
+
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit Facility, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+      }
+
+      .detail-section {
+        background: var(--bg-white);
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .detail-title {
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-sm);
+        font-size: var(--font-size-base);
+      }
+
+      .detail-content {
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        background: var(--bg-light);
+        padding: var(--spacing-sm);
+        border-radius: 5px;
+        border:  1px solid var(--border-color);
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .loading {
+        text-align: center;
+        padding: var(--spacing-2xl);
+        color: var(--text-secondary);
+      }
+
+      .no-logs {
+        text-align: center;
+        padding: var(--spacing-2xl);
+        color: var(--text-secondary);
+      }
+
+      .no-logs-icon {
+        font-size: 3rem;
+        margin-bottom: var(--spacing-lg);
+        opacity: 0.5;
+        color: var(--text-secondary);
+      }
+
+      .no-logs h3 {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-sm);
+        color: var(--text-primary);
+      }
+
+      .no-logs p {
+        font-size: var(--font-size-base);
+        color: var(--text-secondary);
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: var(--spacing-md);
+          align-items: flex-start;
+        }
+
+        .controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-box {
+          min-width: auto;
+        }
+
+        .filter-group {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .stats {
+          flex-direction: column;
+          gap: var(--spacing-md);
+        }
+
+        .log-header {
+          flex-wrap: wrap;
+          gap: var(--spacing-sm);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-content">
+          <h1><i class="fas fa-rocket"></i> API Log Viewer</h1>
+          <p>Interactive dashboard for analyzing API request logs</p>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+
+      <div class="controls" id="controls">
+        <div class="upload-button" onclick="document.getElementById('fileInput').click()">
+          <span class="upload-icon"><i class="fas fa-upload"></i></span>
+          Upload Log File
+        </div>
+        <input type="file" id="fileInput" accept=".txt,.json,.log" style="display: none;" />
+        <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by path, method, or status..."
+          />
+          <span class="search-icon"><i class="fas fa-search"></i></span>
+        </div>
+
+        <div class="filter-group">
+          <select id="methodFilter">
+            <option value="ALL">All Methods</option>
+          </select>
+
+          <select id="statusFilter">
+            <option value="ALL">All Status</option>
+          </select>
+
+          <div class="toggle-switch" onclick="toggleMainRequests()">
+            <span>Hide OPTIONS</span>
+            <div class="switch active" id="mainRequestsToggle">
+              <div class="switch-handle"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats" id="stats" style="display: none">
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-chart-bar"></i></span>
+          <span class="stat-text">Total: <span id="totalLogs">0</span></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-bolt"></i></span>
+          <span class="stat-text">Avg Time: <span id="avgTime">0ms</span></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
+          <span class="stat-text">Success: <span id="successRate">0%</span></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-clock"></i></span>
+          <span class="stat-text">Duration: <span id="totalDuration">0min</span></span>
+        </div>
+      </div>
+
+      <div class="logs-container" id="logsContainer">
+        <div class="no-logs">
+          <div class="no-logs-icon"><i class="fas fa-file-alt"></i></div>
+          <h3>No logs loaded</h3>
+          <p>Upload a log file to get started</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let logs = [];
+      let filteredLogs = [];
+      let expandedRows = new Set();
+      let showOnlyMainRequests = true;
+
+      // Theme Toggle Functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+
+      // Load saved theme from localStorage
+      if (localStorage.getItem('theme') === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      }
+
+      themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          localStorage.setItem('theme', 'dark');
+        } else {
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          localStorage.setItem('theme', 'light');
+        }
+      });
+
+      // File upload handling
+      document
+        .getElementById('fileInput')
+        .addEventListener('change', handleFileUpload);
+
+      // Search and filter event listeners
+      document
+        .getElementById('searchInput')
+        .addEventListener('input', filterLogs);
+      document
+        .getElementById('methodFilter')
+        .addEventListener('change', filterLogs);
+      document
+        .getElementById('statusFilter')
+        .addEventListener('change', filterLogs);
+
+      async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const logsContainer = document.getElementById('logsContainer');
+        logsContainer.innerHTML =
+          '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading logs...</div>';
+
+        try {
+          const text = await file.text();
+          const lines = text.trim().split('\n');
+          logs = [];
+
+          lines.forEach((line, index) => {
+            try {
+              const logEntry = JSON.parse(line);
+              logs.push({ ...logEntry, id: index });
+            } catch (e) {
+              console.warn(`Failed to parse line ${index + 1}:`, e);
+            }
+          });
+
+          if (logs.length === 0) {
+            throw new Error('No valid log entries found');
+          }
+
+          setupFilters();
+          updateStats();
+          filterLogs();
+
+          document.getElementById('stats').style.display = 'flex';
+        } catch (error) {
+          console.error('Error reading file:', error);
+          logsContainer.innerHTML = `
+                    <div class="no-logs">
+                        <div class="no-logs-icon"><i class="fas fa-exclamation-circle"></i></div>
+                        <h3>Error loading file</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+        }
+      }
+
+      function setupFilters() {
+        const methods = [...new Set(logs.map((log) => log.method))];
+        const statusCodes = [...new Set(logs.map((log) => log.status_code))];
+
+        const methodFilter = document.getElementById('methodFilter');
+        const statusFilter = document.getElementById('statusFilter');
+
+        methodFilter.innerHTML = '<option value="ALL">All Methods</option>';
+        statusFilter.innerHTML = '<option value="ALL">All Status</option>';
+
+        methods.forEach((method) => {
+          const option = document.createElement('option');
+          option.value = method;
+          option.textContent = method;
+          methodFilter.appendChild(option);
+        });
+
+        statusCodes.forEach((status) => {
+        const option = document.createElement('option');
+        option.value = status;
+        option.textContent = status;
+        statusFilter.appendChild(option);
+      });
+    }
+
+    function updateStats() {
+      const totalLogs = logs.length;
+      const successLogs = logs.filter(
+        (log) => log.status_code >= 200 && log.status_code < 300
+      ).length;
+      const avgTime =
+        logs.reduce((sum, log) => sum + (log.processing_time || 0), 0) /
+        totalLogs;
+
+      const timestamps = logs.map((log) => new Date(log.timestamp)).sort();
+      const duration =
+        timestamps.length > 1
+          ? (timestamps[timestamps.length - 1] - timestamps[0]) / 1000 / 60
+          : 0;
+
+      document.getElementById('totalLogs').textContent = totalLogs;
+      document.getElementById('avgTime').textContent = `${(
+        avgTime * 1000
+      ).toFixed(1)}ms`;
+      document.getElementById('successRate').textContent = `${(
+        (successLogs / totalLogs) *
+        100
+      ).toFixed(1)}%`;
+      document.getElementById(
+        'totalDuration'
+      ).textContent = `${duration.toFixed(1)}min`;
+    }
+
+    function filterLogs() {
+      const searchTerm = document
+        .getElementById('searchInput')
+        .value.toLowerCase();
+      const methodFilter = document.getElementById('methodFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+
+      filteredLogs = logs.filter((log) => {
+        const matchesSearch =
+          !searchTerm ||
+          log.path.toLowerCase().includes(searchTerm) ||
+          log.method.toLowerCase().includes(searchTerm) ||
+          log.status_code.toString().includes(searchTerm);
+
+        const matchesMethod =
+          methodFilter === 'ALL' || log.method === methodFilter;
+        const matchesStatus =
+          statusFilter === 'ALL' ||
+          log.status_code.toString() === statusFilter;
+        const matchesMainRequest =
+          !showOnlyMainRequests || log.method !== 'OPTIONS';
+
+        return (
+          matchesSearch &&
+          matchesMethod &&
+          matchesStatus &&
+          matchesMainRequest
+        );
+      });
+
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const container = document.getElementById('logsContainer');
+
+      if (filteredLogs.length === 0) {
+        container.innerHTML = `
+                  <div class="no-logs">
+                      <div class="no-logs-icon"><i class="fas fa-search"></i></div>
+                      <h3>No logs match your filters</h3>
+                      <p>Try adjusting your search or filter criteria</p>
+                  </div>
+              `;
+        return;
+      }
+
+      container.innerHTML = filteredLogs
+        .map(
+          (log) => `
+              <div class="log-entry">
+                  <div class="log-header" onclick="toggleExpand(${log.id})">
+                      <span class="expand-icon ${
+                        expandedRows.has(log.id) ? 'rotated' : ''
+                      }"><i class="fas fa-chevron-right"></i></span>
+                      <span class="method-badge method-${log.method}">${
+            log.method
+          }</span>
+                      <span class="status-badge status-${log.status_code}">${
+            log.status_code
+          }</span>
+                      <span class="log-path">${log.path}</span>
+                      <span class="log-time">${new Date(
+                        log.timestamp
+                      ).toLocaleTimeString()}</span>
+                      <span class="processing-time">${(
+                        (log.processing_time || 0) * 1000
+                      ).toFixed(1)}ms</span>
+                  </div>
+                  ${expandedRows.has(log.id) ? renderLogDetails(log) : ''}
+              </div>
+          `
+        )
+        .join('');
+    }
+
+    function renderLogDetails(log) {
+      return `
+              <div class="log-details">
+                  <div class="details-grid">
+                      <div class="detail-section">
+                          <div class="detail-title">Request Info</div>
+                          <div class="detail-content">URL: ${log.url}
+    Request ID: ${log.request_id}
+    Client IP: ${log.client_ip}
+    User Agent: ${log.user_agent?.substring(0, 50)}...</div>
+                      </div>
+                      <div class="detail-section">
+                          <div class="detail-title">Response Info</div>
+                          <div class="detail-content">Status: ${
+                            log.status_code
+                          }
+    Response Size: ${log.response_size} bytes
+    Processing Time: ${((log.processing_time || 0) * 1000).toFixed(2)}ms
+    Content Type: ${log.response_headers?.['content-type'] || 'N/A'}</div>
+                      </div>
+                      ${
+                        log.request_body
+                          ? `
+                      <div class="detail-section">
+                          <div class="detail-title">Request Body</div>
+                          <div class="detail-content">${JSON.stringify(
+                            log.request_body,
+                            null,
+                            2
+                          )}</div>
+                      </div>
+                      `
+                          : ''
+                      }
+                      ${
+                        Object.keys(log.query_params || {}).length > 0
+                          ? `
+                      <div class="detail-section">
+                          <div class="detail-title">Query Parameters</div>
+                          <div class="detail-content">${JSON.stringify(
+                            log.query_params,
+                            null,
+                            2
+                          )}</div>
+                      </div>
+                      `
+                          : ''
+                      }
+                  </div>
+              </div>
+          `;
+    }
+
+    function toggleExpand(logId) {
+      if (expandedRows.has(logId)) {
+        expandedRows.delete(logId);
+      } else {
+        expandedRows.add(logId);
+      }
+      renderLogs();
+    }
+
+    function toggleMainRequests() {
+      showOnlyMainRequests = !showOnlyMainRequests;
+      const toggle = document.getElementById('mainRequestsToggle');
+      toggle.classList.toggle('active', showOnlyMainRequests);
+      filterLogs();
+    }
+  </script>
+</body>
+</html>
